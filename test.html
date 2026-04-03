@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>LTT Iframe Resize Test</title>
+  <style>
+    body { font-family: monospace; padding: 20px; background: #1a1a1a; color: #eee; }
+    h2 { color: #6ee8a8; margin-bottom: 16px; }
+    #log {
+      background: #111; border: 1px solid #333; border-radius: 6px;
+      padding: 12px; margin-bottom: 20px; min-height: 80px;
+      font-size: 13px; line-height: 1.8;
+    }
+    .log-entry { color: #6ee8a8; }
+    .log-entry.warn { color: #f0b429; }
+    iframe {
+      display: block;
+      width: 100%;
+      max-width: 640px;
+      border: 2px solid #0057BC;
+      border-radius: 8px;
+    }
+    #iframeHeight {
+      font-size: 12px; color: #888; margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>🔬 LTT Iframe Resize Debugger</h2>
+
+<div id="log">Waiting for postMessage events...</div>
+<div id="iframeHeight">iframe height: —</div>
+
+<br>
+
+<iframe id="ltt-calc"
+  src="https://YOUR-SITE.netlify.app"
+  width="100%"
+  height="600"
+  frameborder="0"
+  scrolling="no"
+></iframe>
+
+<script>
+  const log = document.getElementById('log');
+  const iframe = document.getElementById('ltt-calc');
+  const heightDisplay = document.getElementById('iframeHeight');
+  let eventCount = 0;
+
+  function addLog(msg, warn) {
+    eventCount++;
+    const el = document.createElement('div');
+    el.className = 'log-entry' + (warn ? ' warn' : '');
+    el.textContent = `[${eventCount}] ${new Date().toLocaleTimeString()} — ${msg}`;
+    log.appendChild(el);
+  }
+
+  window.addEventListener('message', function(e) {
+    // Log ALL messages, not just ltt-resize
+    if (!e.data) {
+      addLog(`received empty/non-object message from ${e.origin}`, true);
+      return;
+    }
+
+    const type = e.data.type || '(no type)';
+    const height = e.data.height || '(no height)';
+
+    addLog(`type="${type}" height=${height} origin=${e.origin}`);
+
+    if (e.data.type === 'ltt-resize') {
+      const newH = e.data.height + 'px';
+      iframe.style.height = newH;
+      heightDisplay.textContent = `iframe height set to: ${newH}`;
+      addLog(`→ iframe.style.height = ${newH}`);
+    }
+  });
+
+  addLog('Listener attached. Interact with the calculator above.');
+</script>
+
+</body>
+</html>
