@@ -576,6 +576,13 @@
   }
 
   document.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+
+  // Notify parent frame of height changes for iframe auto-resize
+  if (window.parent !== window) {
+    new ResizeObserver(() => {
+      window.parent.postMessage({ type: 'ltt-resize', height: document.body.scrollHeight }, '*');
+    }).observe(document.body);
+  }
 </script>
 
 </body>
