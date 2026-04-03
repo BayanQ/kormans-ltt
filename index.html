@@ -143,7 +143,7 @@
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       text-align: center; transition: all .15s;
-      min-height: 52px;
+      min-height: 64px;
     }
     .prop-type input { display: none; }
     .prop-type .pt-label {
@@ -259,10 +259,10 @@
     }
     .breakdown-section-title:first-child { margin-top: 0; }
 
-    .breakdown-table { width: 100%; border-collapse: collapse; font-size: .74rem; margin-bottom: 4px; }
+    .breakdown-table { width: 100%; border-collapse: collapse; font-size: .84rem; margin-bottom: 4px; }
     .breakdown-table th {
       background: var(--gray-lt); color: var(--gray); font-weight: 600;
-      font-size: .65rem; text-transform: uppercase; letter-spacing: .4px;
+      font-size: .75rem; text-transform: uppercase; letter-spacing: .4px;
       padding: 5px 10px; text-align: left; border-bottom: 1px solid var(--border);
     }
     .breakdown-table th:last-child, .breakdown-table td:last-child { text-align: right; }
@@ -274,32 +274,37 @@
     .breakdown-table .rebate-row td { color: #1a7f4b; font-weight: 500; }
     .breakdown-table .grand-total td { background: var(--navy); color: white; font-weight: 700; }
 
-    /* ── 18px font for form + results views ── */
+    /* ── Larger font overrides ── */
     #view-form .field label,
     #view-form .toggle-row .tl,
     #view-form .error-msg,
-    #view-form .location-badge { font-size: 14px; }
+    #view-form .location-badge { font-size: 16px; }
+
+    #view-form .toggle-row .tl small { font-size: 13px; }
+    #view-form .pt-label { font-size: 15px; }
+    #view-form .pt-sub { font-size: 13px; }
 
     #view-form input[type="text"],
-    #view-form input[type="number"] { font-size: 16px; padding: 10px 12px; }
+    #view-form input[type="number"] { font-size: 17px; padding: 10px 12px; }
+    #view-form .input-wrap input[type="text"],
     #view-form .input-wrap input[type="number"] { padding-left: 28px; }
-    #view-form .input-wrap .prefix { font-size: 16px; }
+    #view-form .input-wrap .prefix { font-size: 17px; }
 
     #view-form .btn-primary,
     #view-results .btn-secondary,
     #view-results .btn-outline,
     #view-details .btn-secondary,
-    #view-details .btn-outline { font-size: 15px; }
+    #view-details .btn-outline { font-size: 16px; }
 
-    #view-results .result-property { font-size: 13px; }
+    #view-results .result-property { font-size: 14px; }
     #view-results .result-row .rr-label,
-    #view-results .result-row .rr-amount { font-size: 15px; }
-    #view-results .result-total .rt-label { font-size: 15px; }
-    #view-results .result-total .rt-amount { font-size: 1.7rem; }
-    #view-results .details-link { font-size: 15px; }
-    #view-results .disclaimer { font-size: 12px; }
+    #view-results .result-row .rr-amount { font-size: 16px; }
+    #view-results .result-total .rt-label { font-size: 16px; }
+    #view-results .result-total .rt-amount { font-size: 1.9rem; }
+    #view-results .details-link { font-size: 16px; }
+    #view-results .disclaimer { font-size: 13px; }
 
-    .view-header .section-label { font-size: 11px; }
+    .view-header .section-label { font-size: 13px; }
 
     /* ── Mobile table fix — no horizontal scroll ── */
     .breakdown-table { table-layout: fixed; width: 100%; }
@@ -354,7 +359,7 @@
           <label for="price">Purchase Price</label>
           <div class="input-wrap">
             <span class="prefix">$</span>
-            <input type="number" id="price" placeholder="500,000" min="1" step="1000">
+            <input type="text" inputmode="numeric" id="price" placeholder="500,000">
           </div>
         </div>
 
@@ -491,7 +496,7 @@
   function calculate() {
     const errorEl = document.getElementById('errorMsg');
     errorEl.classList.remove('show');
-    const priceRaw = parseFloat(document.getElementById('price').value);
+    const priceRaw = parseFloat(document.getElementById('price').value.replace(/,/g, ''));
     if (!priceRaw || priceRaw <= 0) {
       errorEl.textContent = 'Please enter a valid purchase price.';
       errorEl.classList.add('show');
@@ -576,6 +581,17 @@
   }
 
   document.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+
+  // Format purchase price with commas as user types
+  document.getElementById('price').addEventListener('input', function() {
+    const pos = this.selectionStart;
+    const prevLen = this.value.length;
+    const raw = this.value.replace(/[^0-9]/g, '');
+    this.value = raw ? parseInt(raw, 10).toLocaleString('en-CA') : '';
+    // Adjust cursor position after comma insertion
+    const diff = this.value.length - prevLen;
+    this.setSelectionRange(pos + diff, pos + diff);
+  });
 
   // Notify parent frame of height changes for iframe auto-resize
   if (window.parent !== window) {
