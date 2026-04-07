@@ -441,7 +441,7 @@
   </div><!-- /card -->
 
 <script>
-  const fmt = n => n.toLocaleString('en-CA', { style:'currency', currency:'CAD', minimumFractionDigits:2, maximumFractionDigits:2 });
+  const fmt = n => Math.ceil(n).toLocaleString('en-CA', { style:'currency', currency:'CAD', minimumFractionDigits:0, maximumFractionDigits:0 });
   const pct = r => (r*100).toFixed(r<0.01?3:r<0.1?2:1)+'%';
 
   const PROVINCIAL_BRACKETS = [
